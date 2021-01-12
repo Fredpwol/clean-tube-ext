@@ -1,11 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="stylesheet" href="/styles/popup.css">
 </head>
+
 <body>
-    <div class="slidecontainer">
-        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-      </div>
+    <h2>
+        Clean Tube
+    </h2>
+    <div class="container">
+        <p>Blur Range: </p>
+        <div class="slidecontainer">
+            <input type="range" min="0" max="10" class="slider" id="myRange">
+        </div>
+        <p>AI Detection: <small>(results may contain wrong predictions!)</small></p>
+        <label class="switch">
+            <input type="checkbox" id="ai-detection">
+            <span class="toggle round"></span>
+        </label>
+        <p>Video Clip:</p>
+        <label class="switch">
+            <input type="checkbox" id="video-clip">
+            <span class="toggle round"></span>
+        </label>
+        <div class="row thumb-select" id="video-range">
+            <div>
+                <label for="start" hidden>Start</label><br>
+                <input type="radio" id="start" name="thumbnail" value="start" hidden>
+            </div>
+            <div>
+                <label for="middle" hidden>Middle</label><br>
+                <input type="radio" id="middle" name="thumbnail" value="middle" hidden>
+            </div>
+            <div>
+                <label for="end" hidden>End</label><br>
+                <input type="radio" id="end" name="thumbnail" value="end" hidden>
+            </div>
+        </div>
+        <div id="output"></div>
+    </div>
 </body>
+<script src="popup.js"></script>
+
 </html>
