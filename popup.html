@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="/styles/metro-all.min.css">
     <link rel="stylesheet" href="/styles/popup.css">
 </head>
 
@@ -9,17 +11,19 @@
     <h2>
         Clean Tube
     </h2>
-    <div class="container">
+    <div class="settings-container">
         <p>Blur Range: </p>
         <div class="slidecontainer">
             <input type="range" min="0" max="10" class="slider" id="myRange">
         </div>
-        <p>AI Detection: <small>(results may contain wrong predictions!)</small></p>
+        <p>AI Detection:</p>
+        <small style="font-size: 10px;">(results may contain wrong predictions!)</small><br>
         <label class="switch">
             <input type="checkbox" id="ai-detection">
             <span class="toggle round"></span>
         </label>
         <p>Video Clip:</p>
+        <small style="font-size: 10px;">(Replace the video thumbnail with a clip from the video)</small><br>
         <label class="switch">
             <input type="checkbox" id="video-clip">
             <span class="toggle round"></span>
@@ -38,9 +42,14 @@
                 <input type="radio" id="end" name="thumbnail" value="end" hidden>
             </div>
         </div>
+        <div>
+            <label> BlackList Channels</label><br>
+            <input id="blacklist" type="text" data-role="taginput" data-cls-tag-title="text-bold fg-white" data-cls-tag="bg-red"
+                data-cls-tag-remover="bg-darkRed fg-white" data-on-tag-add="onTag" data-on-tag-remove="onRemove" data-on-tag-input-create="onTagCreate">
+        </div>
         <div id="output"></div>
     </div>
 </body>
 <script src="popup.js"></script>
-
+<script src="/js/metro.min.js"></script>
 </html>
