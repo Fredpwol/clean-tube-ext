@@ -41,14 +41,19 @@
 
   body{
       width: 300px;
+      padding: 10px;
+      color: red;
   }
 
-  .container{
+  h2{
+    color: black;
+  }
+  .settings-container{
       padding-left:15px;
       padding-right: 15px;
       padding-bottom: 15px;
       border: gray solid 1px;
-      border-radius: 5px;
+      border-radius: 5px
   }
 
   .switch {
