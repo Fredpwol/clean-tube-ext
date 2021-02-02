@@ -3,6 +3,7 @@ var aiSwitch = document.getElementById("ai-detection");
 var output = document.getElementById("output");
 var videoSwitch = document.getElementById("video-clip");
 var videoRange = document.getElementById("video-range");
+var blacklist = document.getElementById("blacklist");
 
 var radioButtons = videoRange.querySelectorAll("input");
 var radioButtonsLabel = videoRange.querySelectorAll("label");
@@ -15,6 +16,16 @@ chrome.storage.local.get("blurRange", (result) => {
     }
     slider.value = result.blurRange;
 })
+
+var lists = "sam,goat,jane";
+
+
+blacklist.value = localStorage.getItem("blacklist");
+
+
+
+// var input = $(el).data('taginput');
+// input.val("sam,fred");
 
 chrome.storage.local.get("aiDetection", (result) => {
     if (!result.aiDetection) {
@@ -70,3 +81,13 @@ radioButtons.forEach(node => {
         chrome.storage.local.set({"thumbnailRange": this.value});
       }
 })
+
+function onTag(tag, val, values){
+    localStorage.setItem("blacklist", values)
+    chrome.storage.local.set({"blacklist": values})
+}
+
+function onRemove(tag, val, values) { 
+    localStorage.setItem("blacklist", values)
+    chrome.storage.local.set({"blacklist": values})
+}
