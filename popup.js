@@ -4,6 +4,7 @@ var output = document.getElementById("output");
 var videoSwitch = document.getElementById("video-clip");
 var videoRange = document.getElementById("video-range");
 var blacklist = document.getElementById("blacklist");
+var censorAll = document.getElementById("censor-all");
 
 var radioButtons = videoRange.querySelectorAll("input");
 var radioButtonsLabel = videoRange.querySelectorAll("label");
@@ -44,6 +45,9 @@ chrome.storage.local.get("thumbnailRange", (result) => {
     })
 })
 
+chrome.storage.local.get("censorAll", (storage) => {
+    censorAll.checked = storage.censorAll || false;
+})
 chrome.storage.local.get("videoClip", (result) => {
     if (!result.videoClip) {
         chrome.storage.local.set({"videoClip": false})
@@ -74,6 +78,9 @@ videoSwitch.onchange = function(){
     radioButtons.forEach(node => {
         node.hidden = !this.checked;
     });
+}
+censorAll.onchange = function(){
+    chrome.storage.local.set({"censorAll": this.checked})
 }
 
 radioButtons.forEach(node => {

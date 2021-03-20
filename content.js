@@ -7,6 +7,7 @@ var videoClip = null;
 var updatedThumbnails = new Set(); // use this to check if the video thumbnail has been updated
 var thumbnailClip = "";
 var previousList = [];
+var prevCensorAll = null;
 
 function isEqaul(firstArr, secondArr) {
   if (firstArr.length !== secondArr.length) return false;
@@ -24,66 +25,75 @@ setInterval(function () {
     chrome.storage.local.get("blurRange", (result) => {
       chrome.storage.local.get("thumbnailRange", (thumbnailRangeStore) => {
         chrome.storage.local.get("blacklist", (storage) => {
-        const channels = storage.blacklist.map(channel => channel.toLowerCase());
-        thumbnailLinks.forEach((link, key) => {
-          if (
-            (!visitedThumbnails.has(key) ||
-              (blurRange != result.blurRange) ||
-              (videoClip != res.videoClip) ||
-              !updatedThumbnails.has(key) ||
-              !isEqaul(channels, previousList) ||
-              (thumbnailRangeStore.thumbnailRange != thumbnailClip)) &&
-            (key != thumbnailLinks.length - 1)
-          ) {
-            {
-              const image = link.querySelector("yt-img-shadow img");
-              let channelName = link.parentElement.nextElementSibling.querySelector("a#avatar-link")?.title.toLowerCase();
-              // console.log("channel name", channelName)
-              if (!channelName) {
-                let name = link.parentElement.nextElementSibling.querySelector("#channel-info")?.querySelector("yt-formatted-string a").innerHTML;
-                channelName = name.toLowerCase();
-              }
-                if (channels.includes(channelName)){
-                  if (!res.videoClip) {
-                    if (!image.src.match("https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*")){
-                      updateThumbnails("hq720",image)
-                    }
-                    image.style.filter = `blur(${result.blurRange}px)`;
-                  } else {
-                    if (image.src) {
-                      let clip;
-                      switch (thumbnailRangeStore.thumbnailRange) {
-                        case "start":
-                          clip = "hq1";
-                          break;
-                        case "middle":
-                          clip = "hq2";
-                          break;
-                        case "end":
-                          clip = "hq3";
-                          break;
-                        default:
-                          clip = "hq1";
-                      }
-                      updateThumbnails(clip, image);
-                      updatedThumbnails.add(key);
-                    }
-                  }
-                }
-                else if(previousList.includes(channelName))
+          chrome.storage.local.get("censorAll", ({ censorAll }) => {
+            const channels = storage.blacklist.map(channel => channel.toLowerCase());
+            thumbnailLinks.forEach((link, key) => {
+              if (
+                (!visitedThumbnails.has(key) ||
+                  (blurRange != result.blurRange) ||
+                  (videoClip != res.videoClip) ||
+                  !updatedThumbnails.has(key) ||
+                  !isEqaul(channels, previousList) ||
+                  prevCensorAll != censorAll ||
+                  (thumbnailRangeStore.thumbnailRange != thumbnailClip)) &&
+                (key != thumbnailLinks.length - 1)
+              ) {
                 {
-                  updateThumbnails("hq720",image);
-                  image.style.filter = "blur(0px)"
+                  const image = link.querySelector("yt-img-shadow img");
+                  let channelName = link.parentElement.nextElementSibling.querySelector("a#avatar-link")?.title.toLowerCase();
+                  if (!channelName) {
+                  // checks search screen videos.
+                    let name = link.parentElement.nextElementSibling.querySelector("#channel-info")?.querySelector("yt-formatted-string a").innerHTML;
+                    channelName = name.toLowerCase();
+                  }
+                  if(!channelName) {
+                    // checks video screen videos.
+                    let name = link.parentElement.nextElementSibling.querySelector("#channel-name")?.querySelector("yt-formatted-string#text").innerHTML;
+                  }
+                    if (channels.includes(channelName) || censorAll){
+                      if (!res.videoClip) {
+                        if (!image.src.match("https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*")){
+                          updateThumbnails("hq720",image)
+                        }
+                        image.style.filter = `blur(${result.blurRange}px)`;
+                      } else {
+                        if (image.src) {
+                          let clip;
+                          switch (thumbnailRangeStore.thumbnailRange) {
+                            case "start":
+                              clip = "hq1";
+                              break;
+                            case "middle":
+                              clip = "hq2";
+                              break;
+                            case "end":
+                              clip = "hq3";
+                              break;
+                            default:
+                              clip = "hq1";
+                          }
+                          updateThumbnails(clip, image);
+                          updatedThumbnails.add(key);
+                        }
+                      }
+                      previousList.push(channelName)
+                    }
+                    else if(previousList.includes(channelName))
+                    {
+                      updateThumbnails("hq720",image);
+                      image.style.filter = "blur(0px)";
+                      delete previousList[previousList.indexOf(channelName)];
+                    }
+                   
                 }
-               
-            }
-            visitedThumbnails.add(key);
-          }
+                visitedThumbnails.add(key);
+              }
+              })
+              videoClip = res.videoClip;
+              thumbnailClip = thumbnailRangeStore.thumbnailRange;
+              blurRange = result.blurRange;
+              prevCensorAll = censorAll;
           })
-          previousList = channels; // use this to keep track of elements removed from the blacklist.
-          videoClip = res.videoClip;
-          thumbnailClip = thumbnailRangeStore.thumbnailRange;
-          blurRange = result.blurRange;
         });
       });
     });
