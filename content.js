@@ -8,6 +8,10 @@ var updatedThumbnails = new Set(); // use this to check if the video thumbnail h
 var thumbnailClip = "";
 var previousList = [];
 var prevCensorAll = null;
+var originalThumbnails = new Map();
+
+
+const timeFrame = 1000; //amount of time in milliseconds to parse the page for any updates.
 
 function isEqaul(firstArr, secondArr) {
   if (firstArr.length !== secondArr.length) return false;
@@ -19,6 +23,7 @@ function isEqaul(firstArr, secondArr) {
   return true;
 }
 
+// runs 
 setInterval(function () {
   var thumbnailLinks = document.querySelectorAll("a#thumbnail");
   chrome.storage.local.get("videoClip", (res) => {
@@ -26,7 +31,7 @@ setInterval(function () {
       chrome.storage.local.get("thumbnailRange", (thumbnailRangeStore) => {
         chrome.storage.local.get("blacklist", (storage) => {
           chrome.storage.local.get("censorAll", ({ censorAll }) => {
-            const channels = storage.blacklist.map(channel => channel.toLowerCase());
+            const channels = storage.blacklist?.map(channel => channel.toLowerCase()) || [];
             thumbnailLinks.forEach((link, key) => {
               if (
                 (!visitedThumbnails.has(key) ||
@@ -40,20 +45,23 @@ setInterval(function () {
               ) {
                 {
                   const image = link.querySelector("yt-img-shadow img");
+                  const videoID = parseLink(link.href);
+                  !originalThumbnails.has(videoID) && image.src.match("https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*") && originalThumbnails.set(videoID, image.src)
                   let channelName = link.parentElement.nextElementSibling.querySelector("a#avatar-link")?.title.toLowerCase();
-                  if (!channelName) {
+                  if (!Boolean(channelName)) {
                   // checks search screen videos.
                     let name = link.parentElement.nextElementSibling.querySelector("#channel-info")?.querySelector("yt-formatted-string a").innerHTML;
-                    channelName = name.toLowerCase();
+                    channelName = name?.toLowerCase();
                   }
-                  if(!channelName) {
+                  if(!Boolean(channelName)) {
                     // checks video screen videos.
-                    let name = link.parentElement.nextElementSibling.querySelector("#channel-name")?.querySelector("yt-formatted-string#text").innerHTML;
+                    let name = link.parentElement.nextElementSibling.querySelector("ytd-channel-name")?.querySelector("yt-formatted-string#text").innerHTML;
+                    channelName = name?.toLowerCase();
                   }
                     if (channels.includes(channelName) || censorAll){
                       if (!res.videoClip) {
-                        if (!image.src.match("https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*")){
-                          updateThumbnails("hq720",image)
+                        if (!image.src.match("https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*") && originalThumbnails.has(videoID)){
+                          image.src = originalThumbnails.get(videoID);
                         }
                         image.style.filter = `blur(${result.blurRange}px)`;
                       } else {
@@ -80,7 +88,7 @@ setInterval(function () {
                     }
                     else if(previousList.includes(channelName))
                     {
-                      updateThumbnails("hq720",image);
+                      image.src = originalThumbnails.get(videoID);
                       image.style.filter = "blur(0px)";
                       delete previousList[previousList.indexOf(channelName)];
                     }
@@ -99,12 +107,10 @@ setInterval(function () {
     });
   });
   // lastThumbnailLength = thumbnailLinks.length-1;
-}, 1000);
+}, timeFrame);
 
 function parseLink(link) {
-  let start = link.indexOf("=") + 1;
-  let res = link.slice(start, start + 11);
-  return res;
+  return link.replace("/watch?v=", "")
 }
 
 function updateThumbnails(newImage, imgObject) {
