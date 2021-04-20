@@ -54,8 +54,13 @@ setInterval(function () {
                     channelName = name?.toLowerCase();
                   }
                   if(!Boolean(channelName)) {
+                    // checks subscripe screen videos.
+                    let name = link.parentElement.nextElementSibling.querySelector("ytd-channel-name")?.querySelector("yt-formatted-string#text a")?.innerHTML;
+                    channelName = name?.toLowerCase();
+                  }
+                  if(!Boolean(channelName)) {
                     // checks video screen videos.
-                    let name = link.parentElement.nextElementSibling.querySelector("ytd-channel-name")?.querySelector("yt-formatted-string#text").innerHTML;
+                    let name = link.parentElement.nextElementSibling.querySelector("ytd-channel-name")?.querySelector("yt-formatted-string#text")?.innerHTML;
                     channelName = name?.toLowerCase();
                   }
                     if (channels.includes(channelName) || censorAll){
