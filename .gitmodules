@@ -1,0 +1,3 @@
+[submodule "clean-tube-app"]
+	path = clean-tube-app
+	url = https://github.com/Fredpwol/clean-tube-app.git
