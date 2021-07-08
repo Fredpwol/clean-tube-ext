@@ -55,33 +55,21 @@ setInterval(function () {
           // used to hold a mapping of video id and image node object
           images.set(videoID, image);
         }
-        !originalThumbnails.has(videoID) &&
-          image.src.match(
-            "https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*"
-          ) &&
-          originalThumbnails.set(videoID, image.src);
-        let channelName = link.parentElement.nextElementSibling
-          .querySelector("a#avatar-link")
-          ?.title.toLowerCase();
+        !originalThumbnails.has(videoID) && image.src.match("https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*") && originalThumbnails.set(videoID, image.src);
+        let channelName = link.parentElement.nextElementSibling.querySelector("a#avatar-link")?.title.toLowerCase();
         if (!Boolean(channelName)) {
           // checks search screen videos.
-          let name = link.parentElement.nextElementSibling
-            .querySelector("#channel-info")
-            ?.querySelector("yt-formatted-string a").innerHTML;
+          let name = link.parentElement.nextElementSibling.querySelector("#channel-info")?.querySelector("yt-formatted-string a").innerHTML;
           channelName = name?.toLowerCase();
         }
         if (!Boolean(channelName)) {
           // checks subscribe screen videos.
-          let name = link.parentElement.nextElementSibling
-            .querySelector("ytd-channel-name")
-            ?.querySelector("yt-formatted-string#text a")?.innerHTML;
+          let name = link.parentElement.nextElementSibling.querySelector("ytd-channel-name")?.querySelector("yt-formatted-string#text a")?.innerHTML;
           channelName = name?.toLowerCase();
         }
         if (!Boolean(channelName)) {
           // checks video screen videos.
-          let name = link.parentElement.nextElementSibling
-            .querySelector("ytd-channel-name")
-            ?.querySelector("yt-formatted-string#text")?.innerHTML;
+          let name = link.parentElement.nextElementSibling.querySelector("ytd-channel-name")?.querySelector("yt-formatted-string#text")?.innerHTML;
           channelName = name?.toLowerCase();
         }
         if (channels.includes(channelName) || censorAll) {
