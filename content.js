@@ -49,68 +49,74 @@ setInterval(function () {
           thumbnailRange != thumbnailClip) &&
         key != thumbnailLinks.length - 1
       ) {
-        {
-          const image = link.querySelector("yt-img-shadow img");
-          const videoID = parseLink(link.href);
-          if (!images.has(videoID)) {
-            // used to hold a mapping of video id and image node object
-            images.set(videoID, image);
-          }
-          !originalThumbnails.has(videoID) &&
-            image.src.match(
-              "https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*"
-            ) &&
-            originalThumbnails.set(videoID, image.src);
-          let channelName = link.parentElement.nextElementSibling.querySelector("a#avatar-link")?.title.toLowerCase();
-          if (!Boolean(channelName)) {
-            // checks search screen videos.
-            let name = link.parentElement.nextElementSibling.querySelector("#channel-info")?.querySelector("yt-formatted-string a").innerHTML;
-            channelName = name?.toLowerCase();
-          }
-          if (!Boolean(channelName)) {
-            // checks subscribe screen videos.
-            let name = link.parentElement.nextElementSibling.querySelector("ytd-channel-name")?.querySelector("yt-formatted-string#text a")?.innerHTML;
-            channelName = name?.toLowerCase();
-          }
-          if (!Boolean(channelName)) {
-            // checks video screen videos.
-            let name = link.parentElement.nextElementSibling.querySelector("ytd-channel-name")?.querySelector("yt-formatted-string#text")?.innerHTML;
-            channelName = name?.toLowerCase();
-          }
-          if (channels.includes(channelName) || censorAll) {
-            updateVideoThumbnail(
-              videoClip,
-              image,
-              blurRange,
-              videoID,
-              thumbnailRange
-            );
-          } else if (previousList.includes(channelName)) {
-            // restores thumbnail to default values and settings for video whose channel was removed from the blacklist
-            // if the channel is'nt found on the current list but on the previous means it was removed from the blacklist
-            // so we its the reason we have a previous list to compare for changes.
-            image.src = originalThumbnails.get(videoID);
-            image.style.filter = "blur(0px)";
-          } else if (aiDetection && !visitedThumbnails.has(key)) {
-            fetch(`http://localhost:5001/predict-clickbait/${videoID}`)
-              .then((res) => {
-                if (res.status == 200) {
-                  return res.json();
-                }
-              })
-              .then((data) => {
-                if (data.score > 0.5) {
-                  updateVideoThumbnail(
-                    videoClip,
-                    images.get(data._id),
-                    blurRange,
-                    data._id,
-                    thumbnailRange
-                  );
-                }
-              })
-              .catch((err) => console.error(err));
-          }
+        const image = link.querySelector("yt-img-shadow img");
+        const videoID = parseLink(link.href);
+        if (!images.has(videoID)) {
+          // used to hold a mapping of video id and image node object
+          images.set(videoID, image);
+        }
+        !originalThumbnails.has(videoID) &&
+          image.src.match(
+            "https://i.ytimg.com/vi/.*/(hqdefault|mqdefault|hq720).jpg?.*"
+          ) &&
+          originalThumbnails.set(videoID, image.src);
+        let channelName = link.parentElement.nextElementSibling
+          .querySelector("a#avatar-link")
+          ?.title.toLowerCase();
+        if (!Boolean(channelName)) {
+          // checks search screen videos.
+          let name = link.parentElement.nextElementSibling
+            .querySelector("#channel-info")
+            ?.querySelector("yt-formatted-string a").innerHTML;
+          channelName = name?.toLowerCase();
+        }
+        if (!Boolean(channelName)) {
+          // checks subscribe screen videos.
+          let name = link.parentElement.nextElementSibling
+            .querySelector("ytd-channel-name")
+            ?.querySelector("yt-formatted-string#text a")?.innerHTML;
+          channelName = name?.toLowerCase();
+        }
+        if (!Boolean(channelName)) {
+          // checks video screen videos.
+          let name = link.parentElement.nextElementSibling
+            .querySelector("ytd-channel-name")
+            ?.querySelector("yt-formatted-string#text")?.innerHTML;
+          channelName = name?.toLowerCase();
+        }
+        if (channels.includes(channelName) || censorAll) {
+          updateVideoThumbnail(
+            videoClip,
+            image,
+            blurRange,
+            videoID,
+            thumbnailRange
+          );
+        } else if (previousList.includes(channelName)) {
+          // restores thumbnail to default values and settings for video whose channel was removed from the blacklist
+          // if the channel is'nt found on the current list but on the previous means it was removed from the blacklist
+          // so we its the reason we have a previous list to compare for changes.
+          image.src = originalThumbnails.get(videoID);
+          image.style.filter = "blur(0px)";
+        } else if (aiDetection && !visitedThumbnails.has(key)) {
+          fetch(`http://localhost:5001/predict-clickbait/${videoID}`)
+            .then((res) => {
+              if (res.status == 200) {
+                return res.json();
+              }
+            })
+            .then((data) => {
+              if (data.score > 0.5) {
+                updateVideoThumbnail(
+                  videoClip,
+                  images.get(data._id),
+                  blurRange,
+                  data._id,
+                  thumbnailRange
+                );
+              }
+            })
+            .catch((err) => console.error(err));
         }
         visitedThumbnails.add(key);
       }
