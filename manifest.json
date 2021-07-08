@@ -3,17 +3,14 @@
     "version": "1.0",
     "description": "Build an Extension!",
     "permissions": ["storage", "tabs"],
-    "background": {
-      "scripts": ["background.js"]
-    },
-    "manifest_version": 2,
+    "manifest_version": 3,
     "content_scripts": [
         {
             "matches": ["https://www.youtube.com/*"],
             "js": ["content.js"]
         }
     ],
-    "browser_action":{
+    "action":{
       "default_popup": "popup.html",
       "default_title": "Clean Tube"
     }
